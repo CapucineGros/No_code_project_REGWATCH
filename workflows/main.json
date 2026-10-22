@@ -1,0 +1,821 @@
+{
+    "name": "RegWatch - Main",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.5,
+        "position": [
+          -16,
+          48
+        ],
+        "id": "561206bf-17f4-48da-8fd4-487207697a9f",
+        "name": "Telegram Trigger",
+        "webhookId": "d7896d1e-96c6-442f-931f-49774ea052bb",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "telegramApi": {
+            "id": "I7Jrq5TpjKdftblf",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.message.chat.id }}",
+          "text": "Unknown command. Type /start to see what I can do.",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          448,
+          352
+        ],
+        "id": "d6b1ef95-ba1c-485a-9fe0-1a99edfbc2df",
+        "name": "Send a text message",
+        "webhookId": "55ccfc4a-0f87-4c37-9f9e-1161a79225c2",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "telegramApi": {
+            "id": "I7Jrq5TpjKdftblf",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 4
+                  },
+                  "conditions": [
+                    {
+                      "id": "cad4ecfa-eae8-418e-8a7b-774f60cc73f0",
+                      "leftValue": "={{ $json.message.text }}",
+                      "rightValue": "/stop",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "stop"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 4
+                  },
+                  "conditions": [
+                    {
+                      "id": "d35c023b-5e1b-41fd-9649-0fd01955d125",
+                      "leftValue": "={{ $json.message.text }}",
+                      "rightValue": "/start",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "start"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 4
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.message.text }}",
+                      "rightValue": "/topics",
+                      "operator": {
+                        "type": "string",
+                        "operation": "startsWith"
+                      },
+                      "id": "668310a2-0176-4ff1-b584-25d00f67e693"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "topics"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 4
+                  },
+                  "conditions": [
+                    {
+                      "id": "c6eae0ca-b4fc-48c2-a6f5-65494b4fb314",
+                      "leftValue": "={{ $json.message.text }}",
+                      "rightValue": "/fetch",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "fetch"
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra"
+          }
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.5,
+        "position": [
+          224,
+          0
+        ],
+        "id": "9a89a04c-d0ac-4f0c-9615-66a66367bf85",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Code').item.json.chat_id }}",
+          "text": "=Got it! You follow: {{ $('Code').item.json.topics_text }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1040,
+          -112
+        ],
+        "id": "b40018ac-eddd-4c59-98a4-436e34df1d39",
+        "name": "Send a text message1",
+        "webhookId": "6b67339b-ae9c-49a6-84b8-165a99f88b1c",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "telegramApi": {
+            "id": "I7Jrq5TpjKdftblf",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw",
+            "mode": "list",
+            "cachedResultName": "RegWatch",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Subscribers",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chat_id": "={{ $json.chat_id }}",
+              "topics": "={{ $json.topics_text }}"
+            },
+            "matchingColumns": [
+              "chat_id"
+            ],
+            "schema": [
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "topics",
+                "displayName": "topics",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          832,
+          -112
+        ],
+        "id": "63b148b2-8517-4a71-8a66-bb2ccf9bfa16",
+        "name": "Append or update row in sheet",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "HE8LxxS0cmCOyp0f",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Parse \"/topics liquidity, IRRBB\" into a clean list of topics\nconst text = $json.message.text;\nconst chatId = $json.message.chat.id;\n\nconst topics = text\n  .replace('/topics', '')\n  .split(',')\n  .map(t => t.trim().toLowerCase())\n  .filter(t => t.length > 0);\n\nreturn {\n  json: {\n    chat_id: chatId,\n    topics: topics,\n    topics_text: topics.join(', '),\n    valid: topics.length > 0\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          448,
+          -32
+        ],
+        "id": "69a5b32d-41be-437e-8d6b-16d1adb8a0da",
+        "name": "Code"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw",
+            "mode": "list",
+            "cachedResultName": "RegWatch",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Subscribers",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "chat_id",
+                "lookupValue": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          656,
+          160
+        ],
+        "id": "7e1900dc-b58b-441f-824f-2d9c2ef1853c",
+        "name": "Get Subscriber",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "UdSlzWR6FRJpfjeY",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 8
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          -16,
+          352
+        ],
+        "id": "5904a163-88bc-4adb-8115-82f1e03055ea",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw",
+            "mode": "list",
+            "cachedResultName": "RegWatch",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Subscribers",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit#gid=0"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          224,
+          352
+        ],
+        "id": "4489824d-ed24-4d1b-afca-ba5e062f2cc0",
+        "name": "Get All Subscribers",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "UdSlzWR6FRJpfjeY",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "paqMtIrMeB532ISb",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/paqMtIrMeB532ISb",
+            "cachedResultName": "Process subscriber"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chat_id": "={{ String($json.chat_id) }}",
+              "topics": "={{ $json.topics }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "topics",
+                "displayName": "topics",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "mode": "each",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.4,
+        "position": [
+          880,
+          160
+        ],
+        "id": "e1752b90-3050-456e-81d7-71886227e37d",
+        "name": "Execute Workflow",
+        "retryOnFail": true
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.message.chat.id }}",
+          "text": "⏳ Looking for new publications on your topics...",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          448,
+          160
+        ],
+        "id": "e0cfdd89-a4f6-4013-9710-1a2d1c40248d",
+        "name": "Waiting message",
+        "webhookId": "68d509c5-eae9-43d2-a740-5ceea0778975",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "telegramApi": {
+            "id": "I7Jrq5TpjKdftblf",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.message.chat.id }}",
+          "text": "=👋 Welcome to RegWatch! \nI watch the ECB press feed and send you only the publications that match your topics, with a one-sentence summary.  \nWhat you can ask me: \n/topics liquidity, IRRBB → choose the topics you follow \n/fetch → check for new publications now  I also check automatically every day at 8:00\n/stop → unsubscribe",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          448,
+          -192
+        ],
+        "id": "934629bb-1ea2-47d2-bbc0-ea2be084e60b",
+        "name": "Introductory message",
+        "webhookId": "39911ff8-abb6-4ad5-ba8f-59b3efbe8ca6",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "telegramApi": {
+            "id": "I7Jrq5TpjKdftblf",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw",
+            "mode": "list",
+            "cachedResultName": "RegWatch",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Subscribers",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "chat_id",
+                "lookupValue": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          448,
+          -352
+        ],
+        "id": "452adc74-f080-4773-84f3-94138756478d",
+        "name": "Find Subscriber",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "UdSlzWR6FRJpfjeY",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "documentId": {
+            "__rl": true,
+            "value": "1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw",
+            "mode": "list",
+            "cachedResultName": "RegWatch",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Subscribers",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit#gid=0"
+          },
+          "startIndex": "={{ $json.row_number }}"
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          656,
+          -352
+        ],
+        "id": "27ab9eb4-a4c3-4450-be33-394228e04498",
+        "name": "Delete the row",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "UdSlzWR6FRJpfjeY",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "You are unsubscribed. Send /topics to subscribe again.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          880,
+          -352
+        ],
+        "id": "422c6e27-262b-44c8-aa17-863f970cf44a",
+        "name": "Send a text message2",
+        "webhookId": "c400c03c-a759-41e1-88a0-f0d1714c2e68",
+        "retryOnFail": true,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "telegramApi": {
+            "id": "I7Jrq5TpjKdftblf",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 4
+            },
+            "conditions": [
+              {
+                "id": "ad26f87d-b466-47e6-a9d4-cc8192350490",
+                "leftValue": "={{ $json.valid }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.4,
+        "position": [
+          640,
+          -32
+        ],
+        "id": "fb4d4526-0cb4-458c-944b-4e8cb5a859db",
+        "name": "Is topic valid ?"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "Usage: /topics liquidity, IRRBB",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          832,
+          48
+        ],
+        "id": "aa32f64a-791e-4fb8-aff1-64fde5ad2267",
+        "name": "Send a text message3",
+        "webhookId": "2f10045c-0578-4a6b-92f9-9c2964cb5e81",
+        "credentials": {
+          "telegramApi": {
+            "id": "I7Jrq5TpjKdftblf",
+            "name": "Telegram account"
+          }
+        }
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [
+            {
+              "node": "Find Subscriber",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Introductory message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Waiting message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append or update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Send a text message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code": {
+        "main": [
+          [
+            {
+              "node": "Is topic valid ?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Subscriber": {
+        "main": [
+          [
+            {
+              "node": "Execute Workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get All Subscribers",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All Subscribers": {
+        "main": [
+          [
+            {
+              "node": "Execute Workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Waiting message": {
+        "main": [
+          [
+            {
+              "node": "Get Subscriber",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find Subscriber": {
+        "main": [
+          [
+            {
+              "node": "Delete the row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Delete the row": {
+        "main": [
+          [
+            {
+              "node": "Send a text message2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is topic valid ?": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": true,
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate",
+      "timeSavedMode": "fixed",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false,
+      "errorWorkflow": "xqLuE1tYqPQwq3ii"
+    },
+    "versionId": "5dfa6726-2b9b-4de7-bc5a-6c2059c95a39",
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "d4f3ebdc140455b123ad8cba1b138d4d715fd289ca8fe1f45300862e4389ce9b"
+    },
+    "nodeGroups": [],
+    "id": "Lr6KHESkiKnD1Enp",
+    "tags": []
+  }
