@@ -24,6 +24,12 @@ If nothing new was found, or nothing was relevant, the bot says so instead of st
 
 ## Architecture
 
+Diagrams are in the `diagrams/` folder.
+
+- `diagrams/main.png`: main workflow, with the Switch router, the five routes and the daily schedule
+- `diagrams/process_subscriber.png`: the Process subscriber pipeline (feed, deduplication, scoring, sending, logging)
+- `diagrams/score_item.png`: the Score item sub-workflow (LLM call, validation, fallback)
+
 Summary of the flow:
 
 1. A Telegram message (or the 08:00 schedule) triggers the main workflow.
@@ -46,6 +52,10 @@ Summary of the flow:
 │   ├── process_subscriber.json
 │   ├── score_item.json
 │   └── error_alert.json
+├── diagrams/                 architecture diagrams and screenshots
+│   ├── main.png
+│   ├── process_subscriber.png
+│   └── score_item.png
 └── README.md
 ```
 
