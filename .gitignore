@@ -1,0 +1,18 @@
+# Secrets
+.env
+*.pem
+*.key
+
+# Local data and Docker volumes
+postgres_data/
+n8n_data/
+.n8n/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
