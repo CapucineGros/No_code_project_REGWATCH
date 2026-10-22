@@ -1,0 +1,563 @@
+{
+  "name": "Process subscriber",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chat_id"
+            },
+            {
+              "name": "topics"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -560,
+        336
+      ],
+      "id": "46a80244-aa0f-4790-8f71-1df199225975",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "https://www.ecb.europa.eu/rss/press.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        336
+      ],
+      "id": "6216717a-8c03-446a-9129-9f5661ca3004",
+      "name": "RSS Read",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw",
+          "mode": "list",
+          "cachedResultName": "RegWatch",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 417570305,
+          "mode": "list",
+          "cachedResultName": "Sent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit#gid=417570305"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -160,
+        336
+      ],
+      "id": "198cad0f-5f7c-4746-bf0a-b4652509b0f7",
+      "name": "Get Sent",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UdSlzWR6FRJpfjeY",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Read the subscriber passed in by the parent workflow\nconst chatId = String($('When Executed by Another Workflow').first().json.chat_id);\nconst norm = s => String(s || '').trim().toLowerCase();\nconst topics = $('When Executed by Another Workflow').first().json.topics;\n\nconst sent = $('Get Sent').all()\n  .filter(r => String(r.json.chat_id) === chatId);\nconst sentLinks = new Set(sent.map(r => norm(r.json.link)));\nconst sentTitles = new Set(sent.map(r => norm(r.json.title)).filter(t => t));\n\nconst seenTitles = new Set();\nconst out = [];\nfor (const i of $('RSS Read').all()) {\n  const link = norm(i.json.link);\n  const title = norm(i.json.title);\n  // Skip if already sent, or duplicated inside this same feed\n  if (!link || sentLinks.has(link) || sentTitles.has(title) || seenTitles.has(title)) continue;\n  seenTitles.add(title);\n  out.push({\n    json: { chat_id: chatId, topics, title: i.json.title, link: i.json.link, date: i.json.pubDate }\n  });\n}\n\n// Limit AI calls (free tier quota)\nreturn out.slice(0, 3);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        336
+      ],
+      "id": "989ffc2b-829f-459c-b4a0-b560b643f897",
+      "name": "Dedup Code",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "be016GSmQL0tznyd",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/be016GSmQL0tznyd",
+          "cachedResultName": "Score item"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $json.chat_id }}",
+            "topics": "={{ $json.topics }}",
+            "link": "={{ $json.link }}",
+            "title": "={{ $json.title }}",
+            "date": "={{ $json.date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "topics",
+              "displayName": "topics",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        560,
+        208
+      ],
+      "id": "f7c6a1a4-6fac-45fe-bdb6-45bbf4f6623f",
+      "name": "Execute Workflow",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').first().json.chat_id }}",
+        "text": "=📌 <b>{{ $json.title.trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }}</b>\nTopic: {{ $json.matched_topic }} (score {{ $json.score }}/10)\n{{ $json.summary.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }}\n{{ $json.link }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        944,
+        80
+      ],
+      "id": "eab084d8-c5a8-407b-a74d-97a57b2e6ff2",
+      "name": "Send a text message2",
+      "webhookId": "dbfe260e-b721-4ebe-9277-91089ce94caf",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "telegramApi": {
+          "id": "I7Jrq5TpjKdftblf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw",
+          "mode": "list",
+          "cachedResultName": "RegWatch",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 417570305,
+          "mode": "list",
+          "cachedResultName": "Sent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit#gid=417570305"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Execute Workflow').item.json.chat_id }}",
+            "link": "={{ $('Execute Workflow').item.json.link }}",
+            "title": "={{ $('Execute Workflow').item.json.title }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        224
+      ],
+      "id": "b703f9b8-c710-4cd2-a098-f80a462ea6d3",
+      "name": "Append row in sent",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UdSlzWR6FRJpfjeY",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "7549774b-f119-455b-b2f9-830aea02e34d",
+              "leftValue": "={{ !!$json.link }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        272,
+        336
+      ],
+      "id": "fe7d7d0b-8ad2-478a-a23e-297def3df7ef",
+      "name": "Has new?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').first().json.chat_id }}",
+        "text": "No new publication since your last check.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        464
+      ],
+      "id": "c3745b0a-1817-4f87-a6ea-a9ddfc17802c",
+      "name": "Send a text message",
+      "webhookId": "d6edc8b1-da40-4ea0-841c-5000548e821b",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "telegramApi": {
+          "id": "I7Jrq5TpjKdftblf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "f6dd8c40-da5f-4105-8831-481fa677d73e",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 6,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        752,
+        208
+      ],
+      "id": "39715ed7-9606-41c8-b106-579781362683",
+      "name": "Relevant?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Notify the user only if no item reached them\nconst sent = $('Relevant?').all(0).length;\nconst total = sent + $('Relevant?').all(1).length;\nif (sent > 0) return [];\nreturn [{\n  json: {\n    chat_id: $('When Executed by Another Workflow').first().json.chat_id,\n    total\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        224
+      ],
+      "id": "1acf1743-6e89-4350-bba7-a3a1fb8eb3ce",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "=No highly relevant publication among the {{ $json.total }} new ones.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        224
+      ],
+      "id": "985f0c5f-9fb0-481a-ac43-284fc40bd920",
+      "name": "Send a text message1",
+      "webhookId": "9e875863-47d4-42b4-9fd0-bba4c6977045",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "telegramApi": {
+          "id": "I7Jrq5TpjKdftblf",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Get Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sent": {
+      "main": [
+        [
+          {
+            "node": "Dedup Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedup Code": {
+      "main": [
+        [
+          {
+            "node": "Has new?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Relevant?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has new?": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relevant?": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "b4cc24c6-81f5-406a-8748-7ca0fbaf5d3d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d4f3ebdc140455b123ad8cba1b138d4d715fd289ca8fe1f45300862e4389ce9b"
+  },
+  "nodeGroups": [],
+  "id": "paqMtIrMeB532ISb",
+  "tags": []
+}
