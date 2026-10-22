@@ -4,6 +4,8 @@ RegWatch is a Telegram bot that helps bank risk and ALM teams follow ECB publica
 
 Built with n8n for the course "No code software development". Level 2 (intermediate), with some level 3 elements: sub-workflows, retries, an error workflow and state kept between runs.
 
+You can find the link to the Google Sheet here: https://docs.google.com/spreadsheets/d/1GqNbbZaLmVxnmeUBPhGmrTDbed890DxNhM44kQa46qw/edit?usp=sharing
+
 ## The need
 
 Risk and ALM teams must follow ECB press releases, speeches and interviews on precise topics. Today they scan long feeds by hand, which is slow and makes it easy to miss something important. RegWatch does that filtering for them and delivers the result in the chat tool they already use.
